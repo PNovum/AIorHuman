@@ -1,0 +1,110 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:14
+    container_name: postgres-server
+    environment:
+      POSTGRES_DB: ${MLFLOW_DB_NAME:-mlflow_db}
+      POSTGRES_USER: ${MLFLOW_DB_USER:-mlflow_user}
+      POSTGRES_PASSWORD: ${MLFLOW_DB_PASSWORD:-mlflow_pass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio-server
+    environment:
+      MINIO_ROOT_USER: myuser
+      MINIO_ROOT_PASSWORD: mypassword
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.10
+    container_name: clickhouse-server
+    ports:
+      - "8123:8123"
+      - "9002:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+
+  mlflow:
+    build:
+      context: ./mlflow5
+      dockerfile: Dockerfile
+    container_name: mlflow-server
+    depends_on:
+      - postgres
+      - minio
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri ${MLFLOW_BACKEND_STORE_URI}
+      --artifacts-destination ${MLFLOW_ARTIFACT_ROOT}
+      --serve-artifacts
+      --allowed-hosts *
+      --cors-allowed-origins *
+    environment:
+      MLFLOW_FLASK_SERVER_SECRET_KEY: ${MLFLOW_FLASK_SERVER_SECRET_KEY:-secret}
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-myuser}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-mypassword}
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      MLFLOW_AUTH_CONFIG_PATH: /mlflow_config/basic_auth.ini
+      MLFLOW_BACKEND_STORE_URI: postgresql+psycopg2://${MLFLOW_DB_USER:-mlflow_user}:${MLFLOW_DB_PASSWORD:-mlflow_pass}@postgres:5432/${MLFLOW_DB_NAME:-mlflow_db}?options=-csearch_path=mlflow
+      MLFLOW_ARTIFACT_ROOT: s3://mlflow
+    ports:
+      - "${MLFLOW_PORT:-5050}:5000"
+
+  inference_service:
+    build:
+      context: ./inference_service
+      dockerfile: Dockerfile
+    container_name: inference_service
+    depends_on:
+      - mlflow
+    environment:
+      MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI:-http://mlflow:5000}
+      MLFLOW_REGISTRY_URI: ${MLFLOW_REGISTRY_URI:-http://mlflow:5000}
+      MLFLOW_TRACKING_USERNAME: ${MLFLOW_TRACKING_USERNAME:-admin}
+      MLFLOW_TRACKING_PASSWORD: ${MLFLOW_TRACKING_PASSWORD:-your_password}
+      INFERENCE_SERVICE_PORT_FASTAPI: ${INFERENCE_SERVICE_PORT_FASTAPI:-8000}
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-myuser}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-mypassword}
+    ports:
+      - "${INFERENCE_SERVICE_PORT_FASTAPI:-8000}:8000"
+
+  youarebot:
+    build:
+      context: ./youarebot
+      dockerfile: Dockerfile
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    container_name: youarebot
+    depends_on:
+      - inference_service
+    environment:
+      INFERENCE_HOST: inference_service
+      INFERENCE_SERVICE_PORT_FASTAPI: ${INFERENCE_SERVICE_PORT_FASTAPI:-8000}
+      SERVICE_HOST: 0.0.0.0
+      SERVICE_PORT: 8000
+      BASIC_USER: ${BASIC_USER}
+      BASIC_PASS: ${BASIC_PASS}
+    ports:
+      - "8080:8000"
+
+
+
+
+volumes:
+  postgres_data:
+  minio_data:
+  clickhouse_data:

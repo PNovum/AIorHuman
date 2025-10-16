@@ -1,0 +1,14 @@
+artifact_uri: file:///home/polshmelev/n.polishchuk/week3-homework/mlruns/548219124429437588/69f57fafe1c2413eb43c8a663aa82438/artifacts
+end_time: 1759695558486
+entry_point_name: ''
+experiment_id: '548219124429437588'
+lifecycle_stage: active
+run_id: 69f57fafe1c2413eb43c8a663aa82438
+run_name: logreg-ne1-ct0.7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1759695554827
+status: 3
+tags: []
+user_id: polshmelev

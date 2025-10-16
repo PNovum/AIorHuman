@@ -1,0 +1,10 @@
+artifact_location: file:///home/polshmelev/n.polishchuk/week3-homework/mlruns/548219124429437588/models/m-2b1196bed1d5445cbb619181a4c275ab/artifacts
+creation_timestamp: 1759691265566
+experiment_id: '548219124429437588'
+last_updated_timestamp: 1759691268642
+model_id: m-2b1196bed1d5445cbb619181a4c275ab
+model_type: null
+name: model
+source_run_id: 2589eb206077440f92e2d8d000d5cb57
+status: 2
+status_message: null
