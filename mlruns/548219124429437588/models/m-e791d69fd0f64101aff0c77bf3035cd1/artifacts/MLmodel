@@ -1,0 +1,22 @@
+artifact_path: file:///home/polshmelev/n.polishchuk/week3-homework/mlruns/548219124429437588/models/m-e791d69fd0f64101aff0c77bf3035cd1/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.3
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.2
+mlflow_version: 3.4.0
+model_id: m-e791d69fd0f64101aff0c77bf3035cd1
+model_size_bytes: 458418
+model_uuid: m-e791d69fd0f64101aff0c77bf3035cd1
+prompts: null
+run_id: 5762f68f13524e44bd4e877cc78f6244
+utc_time_created: '2025-10-05 20:19:28.796152'

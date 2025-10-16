@@ -1,0 +1,9 @@
+aliases:
+  challenger: '6'
+  champion: '8'
+creation_timestamp: 1759691243107
+deployment_job_id: null
+deployment_job_state: null
+description: null
+last_updated_timestamp: 1759695595229
+name: model-svc

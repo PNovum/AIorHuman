@@ -1,0 +1,7 @@
+{
+  "dlg-123": [
+    {"message": 1, "participant_index": 0, "text": "Привет! Как дела?"},
+    {"message": 2, "participant_index": 1, "text": "Здравствуйте! Чем могу помочь?"},
+    {"message": 3, "participant_index": 0, "text": "Подскажи статус"}
+  ]
+}
